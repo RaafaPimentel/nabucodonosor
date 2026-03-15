@@ -93,7 +93,8 @@ The frontend only reads from the database through the internal data layer and ne
 ## Free-Tier Mode
 
 - The project is configured by default to use `GNews` only.
-- Sync cadence is reduced to once per hour in [vercel.json](/mnt/c/Users/RFEF3Q/Documents/nabucodonosor/vercel.json).
+- Vercel cron is disabled by default so the project works on the Hobby plan without paid scheduling.
+- Sync is expected to be triggered manually from the admin console or via `npm run sync:news`.
 - Homepage/API revalidation is reduced to every 30 minutes.
 - This keeps the project usable without paying for multiple news APIs, but it should be treated as a periodically updated prototype rather than a real-time terminal.
 
@@ -101,7 +102,7 @@ The frontend only reads from the database through the internal data layer and ne
 
 - Deploy the app to Vercel.
 - Add the same environment variables to Vercel.
-- Keep [vercel.json](/mnt/c/Users/RFEF3Q/Documents/nabucodonosor/vercel.json) so `/api/sync` runs once per hour in the default free-tier mode.
+- In the default free-tier mode, use the admin console or `npm run sync:news` for manual syncs instead of Vercel cron.
 - Point the project at a Supabase PostgreSQL instance.
 
 ## Admin
@@ -128,6 +129,7 @@ The frontend only reads from the database through the internal data layer and ne
 - Create at least two admin accounts so one disabled or lost account does not lock you out.
 - Review `admin_audit_logs` and `admin_login_attempts` tables regularly.
 - Restrict who can call `/api/sync` and prefer Vercel cron plus a secret header only.
+- On Vercel Hobby, do not depend on cron. Use manual/admin-triggered syncs or an external free scheduler if needed later.
 - Confirm your Vercel project does not expose server env vars to the client bundle.
 - Keep CSP reviewed if you later add third-party scripts, analytics, or external font/CDN assets.
 - Follow the full launch runbook in [docs/launch-runbook.md](/mnt/c/Users/RFEF3Q/Documents/nabucodonosor/docs/launch-runbook.md).
