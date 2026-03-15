@@ -1,0 +1,43 @@
+import { ArticleCard } from "@/components/article-card";
+import { FeaturedCard } from "@/components/featured-card";
+import { ArticleRecord } from "@/lib/types";
+
+export function NewsSection({
+  title,
+  description,
+  badge,
+  featured,
+  articles
+}: {
+  title: string;
+  description: string;
+  badge: string;
+  featured: ArticleRecord | null;
+  articles: ArticleRecord[];
+}) {
+  return (
+    <section className="space-y-6">
+      <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+        <div className="space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-200/80">{badge}</p>
+          <h2 className="text-2xl font-semibold tracking-tight text-white">{title}</h2>
+        </div>
+        <p className="max-w-2xl text-sm leading-7 text-slate-400">{description}</p>
+      </div>
+      {featured ? (
+        <div className="grid gap-5 lg:grid-cols-[1.25fr_0.95fr]">
+          <FeaturedCard article={featured} badge={badge} />
+          <div className="grid gap-4">
+            {articles.map((article) => (
+              <ArticleCard key={article.id} article={article} badge={badge} />
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="rounded-[2rem] border border-dashed border-white/10 bg-white/[0.03] p-8 text-sm text-slate-400">
+          No articles available yet for this section. The sync job will populate it once provider credentials are configured.
+        </div>
+      )}
+    </section>
+  );
+}
