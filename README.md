@@ -1,6 +1,6 @@
 # Oraculum
 
-Oraculum is a premium full-stack technology intelligence dashboard built with Next.js, TypeScript, Tailwind CSS, and Supabase. It ingests articles from multiple news APIs through a provider adapter architecture, normalizes and deduplicates them, ranks them, and renders an editorial homepage backed by PostgreSQL.
+Oraculum is a full-stack technology intelligence dashboard built with Next.js, TypeScript, Tailwind CSS, and Supabase. It ingests articles through a provider adapter architecture, normalizes and deduplicates them, ranks them, and renders an editorial homepage backed by PostgreSQL.
 
 ## Stack
 
@@ -90,11 +90,18 @@ interface ProviderAdapter {
 
 The frontend only reads from the database through the internal data layer and never calls news providers directly.
 
+## Free-Tier Mode
+
+- The project is configured by default to use `GNews` only.
+- Sync cadence is reduced to once per hour in [vercel.json](/mnt/c/Users/RFEF3Q/Documents/nabucodonosor/vercel.json).
+- Homepage/API revalidation is reduced to every 30 minutes.
+- This keeps the project usable without paying for multiple news APIs, but it should be treated as a periodically updated prototype rather than a real-time terminal.
+
 ## Deployment
 
 - Deploy the app to Vercel.
 - Add the same environment variables to Vercel.
-- Keep [vercel.json](/mnt/c/Users/RFEF3Q/Documents/nabucodonosor/vercel.json) so `/api/sync` runs every 5 minutes.
+- Keep [vercel.json](/mnt/c/Users/RFEF3Q/Documents/nabucodonosor/vercel.json) so `/api/sync` runs once per hour in the default free-tier mode.
 - Point the project at a Supabase PostgreSQL instance.
 
 ## Admin

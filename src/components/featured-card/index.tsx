@@ -1,10 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { ArticleRecord } from "@/lib/types";
+import { DashboardArticle } from "@/lib/types";
+import { isAllowedImageUrl } from "@/lib/utils/images";
 import { timeAgo } from "@/lib/utils";
 
-export function FeaturedCard({ article, badge }: { article: ArticleRecord; badge: string }) {
+export function FeaturedCard({ article, badge }: { article: DashboardArticle; badge: string }) {
+  const showImage = isAllowedImageUrl(article.imageUrl);
+  const imageUrl = showImage ? article.imageUrl! : null;
+
   return (
     <Link
       href={article.url}
@@ -13,9 +17,9 @@ export function FeaturedCard({ article, badge }: { article: ArticleRecord; badge
       className="group relative overflow-hidden rounded-[2rem] border border-white/10 bg-slate-950/70 p-6 shadow-panel backdrop-blur-xl transition duration-300 hover:-translate-y-1"
     >
       <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/10 via-transparent to-blue-500/10 opacity-80" />
-      {article.imageUrl ? (
+      {imageUrl ? (
         <div className="relative mb-6 aspect-[16/9] overflow-hidden rounded-[1.5rem] border border-white/10">
-          <Image src={article.imageUrl} alt={article.title} fill className="object-cover transition duration-700 group-hover:scale-105" />
+          <Image src={imageUrl} alt={article.title} fill className="object-cover transition duration-700 group-hover:scale-105" />
         </div>
       ) : null}
       <div className="relative space-y-4">
@@ -30,6 +34,19 @@ export function FeaturedCard({ article, badge }: { article: ArticleRecord; badge
           <p className="max-w-2xl text-sm leading-7 text-slate-300">
             {article.summary || "A prioritized briefing selected from the latest trusted coverage."}
           </p>
+          {article.intelligenceTags.length ? (
+            <div className="flex flex-wrap gap-2">
+              {article.intelligenceTags.map((tag) => (
+                <span key={tag} className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-slate-300">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          ) : null}
+          <div className="space-y-1">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">Why This Matters</p>
+            <p className="max-w-2xl text-sm leading-6 text-cyan-100/80">{article.whyThisMatters}</p>
+          </div>
           {article.signalSummary ? (
             <p className="max-w-2xl text-xs uppercase tracking-[0.2em] text-cyan-100/75">{article.signalSummary}</p>
           ) : null}

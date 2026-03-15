@@ -1,6 +1,8 @@
 import { Suspense } from "react";
 import { DashboardShell } from "@/components/dashboard-shell";
 
+export const revalidate = 1800;
+
 export default function HomePage() {
   return (
     <Suspense fallback={<DashboardSkeleton />}>

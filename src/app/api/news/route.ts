@@ -3,6 +3,8 @@ import { getDashboardData } from "@/lib/news";
 import { rateLimit } from "@/lib/rate-limit";
 import { getClientIp } from "@/lib/security";
 
+export const revalidate = 1800;
+
 export async function GET(request: Request) {
   const ip = getClientIp(request) ?? "unknown";
   const limit = rateLimit(`api-news:${ip}`, { max: 120, windowMs: 60_000 });

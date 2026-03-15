@@ -1,3 +1,10 @@
+import { existsSync } from "fs";
+import { config as loadEnvFile } from "dotenv";
+
+if (existsSync(".env.local")) {
+  loadEnvFile({ path: ".env.local", override: false });
+}
+
 function readEnv(name: string) {
   return process.env[name]?.trim() || "";
 }
