@@ -1,6 +1,6 @@
 import { ArticleCard } from "@/components/article-card";
 import { FeaturedCard } from "@/components/featured-card";
-import { ArticleRecord } from "@/lib/types";
+import { DashboardArticle } from "@/lib/types";
 
 export function NewsSection({
   title,
@@ -12,8 +12,8 @@ export function NewsSection({
   title: string;
   description: string;
   badge: string;
-  featured: ArticleRecord | null;
-  articles: ArticleRecord[];
+  featured: DashboardArticle | null;
+  articles: DashboardArticle[];
 }) {
   return (
     <section className="space-y-6">

@@ -48,6 +48,26 @@ export interface ArticleRecord extends NormalizedArticle {
   updatedAt: string;
 }
 
+export interface DashboardArticle extends ArticleRecord {
+  whyThisMatters: string;
+  intelligenceTags: string[];
+  watchlistEntities: string[];
+}
+
+export interface WatchlistEntry {
+  name: string;
+  articleCount: number;
+  latestPublishedAt: string;
+  articles: DashboardArticle[];
+}
+
+export interface SourceDiversityEntry {
+  sourceName: string;
+  sourceDomain: string;
+  articleCount: number;
+  categories: NewsCategoryId[];
+}
+
 export interface SyncRunRecord {
   id: string;
   provider: string;

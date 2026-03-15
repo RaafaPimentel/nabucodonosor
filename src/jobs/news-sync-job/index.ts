@@ -27,13 +27,13 @@ export async function runNewsSyncJob() {
         const { articles, failures } = await ingestionAgent.run({
           providers: [provider],
           category,
-          limitPerProvider: 10
+          limitPerProvider: 4
         });
 
         failures.forEach((failure) => errors.push(`${failure.provider}: ${failure.error}`));
 
-        const processed = processingAgent.run({ category, articles });
-        const ranked = rankingAgent.run({ category, articles: processed }).slice(0, 12);
+        const processed = processingAgent.run({ category, articles }).slice(0, 6);
+        const ranked = rankingAgent.run({ category, articles: processed }).slice(0, 6);
         const persisted = await upsertArticles(ranked);
         logger.info("Category sync completed", {
           provider: provider.name,

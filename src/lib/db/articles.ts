@@ -55,6 +55,23 @@ export async function getHomepageArticles() {
   return (data ?? []).map(mapArticle);
 }
 
+export async function getTopArticles(limit = 8) {
+  const supabase = getSupabaseClient() as any;
+  const { data, error } = await supabase
+    .from("articles")
+    .select("*")
+    .gte("published_at", new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString())
+    .order("relevance_score", { ascending: false })
+    .order("published_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    throw error;
+  }
+
+  return (data ?? []).map(mapArticle);
+}
+
 export async function getArticlesByCategory(category: NewsCategoryId, limit = 8) {
   const supabase = getSupabaseClient() as any;
   const { data, error } = await supabase
