@@ -1,5 +1,5 @@
 import { allowedImageHosts } from "@/lib/config";
-import { NewsCategory, NormalizedArticle, ProviderArticle } from "@/lib/types";
+import { FeedItem, NewsCategory, NormalizedArticle, ProviderArticle } from "@/lib/types";
 import { canonicalizeUrl, extractDomain, normalizeTitle, sha256 } from "@/lib/utils/hash";
 
 function cleanSummary(summary?: string) {
@@ -20,7 +20,7 @@ function cleanImageUrl(imageUrl?: string) {
   }
 }
 
-export function normalizeArticle(article: ProviderArticle, category: NewsCategory): NormalizedArticle | null {
+export function normalizeArticle(article: ProviderArticle | FeedItem, category: NewsCategory): NormalizedArticle | null {
   if (!article.title || !article.url) {
     return null;
   }

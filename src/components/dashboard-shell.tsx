@@ -40,7 +40,7 @@ export async function DashboardShell() {
                 Trusted coverage across AI, software, markets, gaming, and streaming.
               </h2>
               <p className="max-w-2xl text-base leading-8 text-slate-300">
-                Oraculum ingests reputable global reporting through a lightweight provider setup, normalizes and scores each story, and keeps a periodically refreshed front page sourced from the database.
+                Oraculum ingests official RSS and Atom feeds from reputable publishers and ranked industry blogs, normalizes and scores each story internally, and keeps a periodically refreshed front page sourced from the database.
               </p>
               <p className="max-w-2xl text-sm leading-7 text-slate-400">
                 This free-tier mode favors lower request volume over real-time cadence while still surfacing the strongest stories and signals.
@@ -50,10 +50,10 @@ export async function DashboardShell() {
               {data.stats.latestRuns.length ? (
                 data.stats.latestRuns.slice(0, 4).map((run) => (
                   <div key={run.id} className="flex items-center justify-between rounded-2xl border border-white/5 bg-white/[0.04] px-4 py-3 text-sm">
-                    <div>
+                  <div>
                       <p className="font-medium text-white">{run.provider}</p>
                       <p className="text-slate-400">{formatTimestamp(run.startedAt)}</p>
-                    </div>
+                  </div>
                     <span className="rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.22em] text-slate-300">
                       {run.status}
                     </span>
@@ -61,7 +61,7 @@ export async function DashboardShell() {
                 ))
               ) : (
                 <div className="rounded-2xl border border-dashed border-white/10 bg-white/[0.02] px-4 py-6 text-sm leading-7 text-slate-400">
-                  No sync history yet. Add provider API keys and Supabase credentials, then call `/api/sync` to seed the dashboard.
+                  No sync history yet. Add Supabase credentials, then run a manual sync from the admin console to seed the dashboard.
                 </div>
               )}
             </div>
@@ -160,16 +160,67 @@ export async function DashboardShell() {
           </div>
         </section>
 
-        <div className="mt-12 space-y-14">
-          {data.sections.map((section) => (
-            <NewsSection
-              key={section.id}
-              title={section.name}
-              description={section.description}
-              badge={section.badge}
-              featured={section.featured}
-              articles={section.articles}
-            />
+        <section className="mt-10 rounded-[2rem] border border-white/10 bg-slate-950/45 p-5 shadow-panel backdrop-blur-xl">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-200/80">Explore</p>
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white">Move across the editorial map quickly</h2>
+              <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-400">
+                Core coverage stays on top, while Market Intelligence and Builder Stack add higher-signal business and infrastructure coverage without turning the page into an undifferentiated feed.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-xs uppercase tracking-[0.18em] text-slate-400">
+              {data.sections.length} live sections
+            </div>
+          </div>
+          <div className="mt-6 grid gap-4 xl:grid-cols-3">
+            {data.sectionGroups.map((group) => (
+              <div key={group.id} className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="text-sm font-semibold text-white">{group.name}</div>
+                  <div className="text-[10px] uppercase tracking-[0.18em] text-cyan-100/80">{group.sections.length} sections</div>
+                </div>
+                <p className="mt-2 text-sm leading-6 text-slate-400">{group.description}</p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {group.sections.map((section) => (
+                    <Link
+                      key={section.id}
+                      href={`/#${section.id}`}
+                      className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[11px] uppercase tracking-[0.18em] text-slate-200 transition hover:border-cyan-300/30 hover:text-cyan-100"
+                    >
+                      {section.badge}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <div className="mt-12 space-y-16">
+          {data.sectionGroups.map((group) => (
+            <section key={group.id} id={group.id} className="scroll-mt-28 space-y-8">
+              <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-200/80">{group.name}</p>
+                  <h2 className="mt-2 text-3xl font-semibold tracking-tight text-white">{group.name}</h2>
+                </div>
+                <p className="max-w-2xl text-sm leading-7 text-slate-400">{group.description}</p>
+              </div>
+              <div className="space-y-14">
+                {group.sections.map((section) => (
+                  <NewsSection
+                    key={section.id}
+                    sectionId={section.id}
+                    title={section.name}
+                    description={section.description}
+                    badge={section.badge}
+                    featured={section.featured}
+                    articles={section.articles}
+                  />
+                ))}
+              </div>
+            </section>
           ))}
         </div>
       </div>

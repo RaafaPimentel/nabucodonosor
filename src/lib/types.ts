@@ -3,7 +3,14 @@ export type NewsCategoryId =
   | "programming"
   | "global-economy"
   | "gaming"
-  | "media-streaming";
+  | "media-streaming"
+  | "product"
+  | "devops-cloud"
+  | "data-analytics"
+  | "fintech"
+  | "crypto-digital-assets";
+
+export type FeedFormat = "rss" | "atom";
 
 export type AdminRole = "viewer" | "editor" | "operator" | "admin";
 
@@ -14,6 +21,43 @@ export interface NewsCategory {
   description: string;
   keywords: string[];
   allowedDomains: string[];
+}
+
+export interface NewsCategoryGroup {
+  id: string;
+  name: string;
+  description: string;
+  categoryIds: NewsCategoryId[];
+}
+
+export interface FeedSource {
+  id: string;
+  name: string;
+  siteUrl: string;
+  feedUrl: string;
+  format: FeedFormat;
+  categoryIds: NewsCategoryId[];
+  language: string;
+  credibilityWeight: number;
+  enabled: boolean;
+}
+
+export interface FeedSourceRecord extends FeedSource {
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface FeedItem {
+  title?: string;
+  url?: string;
+  guid?: string;
+  sourceName?: string;
+  sourceDomain?: string;
+  description?: string;
+  imageUrl?: string;
+  publishedAt?: string;
+  language?: string;
+  categories?: string[];
 }
 
 export interface ProviderArticle {
@@ -130,4 +174,26 @@ export interface ScoreDetails {
 export interface ProviderAdapter {
   readonly name: string;
   getArticles(category: NewsCategory, keywords: string[], limit: number): Promise<ProviderArticle[]>;
+}
+
+export interface FeedAdapter {
+  readonly name: string;
+  getFeedItems(source: FeedSource, limit: number): Promise<FeedItem[]>;
+}
+
+export interface FeedFetchFailure {
+  sourceId: string;
+  sourceName: string;
+  error: string;
+}
+
+export interface FeedHealthSnapshot {
+  sourceId: string;
+  sourceName: string;
+  categoryIds: NewsCategoryId[];
+  status: "success" | "partial" | "failed";
+  fetchedCount: number;
+  acceptedCount: number;
+  errorCount: number;
+  lastError?: string;
 }

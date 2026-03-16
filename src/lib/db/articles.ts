@@ -1,3 +1,4 @@
+import { newsCategories } from "@/lib/config";
 import { getSupabaseClient } from "@/lib/db/supabase";
 import { Database } from "@/lib/db/schema";
 import { ArticleRecord, NormalizedArticle, NewsCategoryId, SyncRunRecord } from "@/lib/types";
@@ -204,17 +205,17 @@ export async function getLatestSyncRuns(limit = 10) {
 export async function getArticleCountsByCategory() {
   const supabase = getSupabaseClient() as any;
   const categoryCounts = await Promise.all(
-    (["ai-technology", "programming", "global-economy", "gaming", "media-streaming"] as NewsCategoryId[]).map(async (category) => {
+    newsCategories.map(async (category) => {
       const { count, error } = await supabase
         .from("articles")
         .select("*", { count: "exact", head: true })
-        .eq("category", category);
+        .eq("category", category.id);
 
       if (error) {
         throw error;
       }
 
-      return [category, count ?? 0] as const;
+      return [category.id, count ?? 0] as const;
     })
   );
 

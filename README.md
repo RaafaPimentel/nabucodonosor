@@ -1,6 +1,10 @@
 # Oraculum
 
-Oraculum is a full-stack technology intelligence dashboard built with Next.js, TypeScript, Tailwind CSS, and Supabase. It ingests articles through a provider adapter architecture, normalizes and deduplicates them, ranks them, and renders an editorial homepage backed by PostgreSQL.
+Oraculum is a full-stack technology intelligence dashboard built with Next.js, TypeScript, Tailwind CSS, and Supabase. It ingests articles through an official RSS/Atom feed adapter architecture, normalizes and deduplicates them, ranks them, and renders an editorial homepage backed by PostgreSQL.
+
+Paid news APIs remain optional future extensions. They are no longer required core dependencies for the MVP.
+
+The editorial surface now covers the original core sections plus expanded intelligence topics such as Product, DevOps & Cloud, Data & Analytics, Fintech, and Crypto & Digital Assets.
 
 ## Stack
 
@@ -16,9 +20,13 @@ Oraculum is a full-stack technology intelligence dashboard built with Next.js, T
 ```text
 src/
   agents/
+    classification-agent/
+    feed-health-agent/
+    feed-ingestion-agent/
     ingestion-agent/
     processing-agent/
     ranking-agent/
+    source-registry-agent/
   app/
     api/
       news/
@@ -27,16 +35,13 @@ src/
     article-card/
     featured-card/
     news-section/
+  feeds/
+    rss-feed-adapter/
   jobs/
     news-sync-job/
   lib/
     db/
     utils/
-  providers/
-    currents-provider/
-    gnews-provider/
-    newsapi-provider/
-    newscatcher-provider/
   skills/
     dedupe-articles/
     normalize-article/
@@ -45,10 +50,12 @@ supabase/
   schema.sql
 ```
 
+See [docs/rss-agent-migration.md](/mnt/c/Users/RFEF3Q/Documents/nabucodonosor/docs/rss-agent-migration.md) for the RSS-first agent split and migration sequence.
+
 ## Setup
 
 1. Install dependencies with `npm install`.
-2. Copy `.env.example` to `.env.local` and fill in the API keys and Supabase credentials.
+2. Copy `.env.example` to `.env.local` and fill in the Supabase credentials and admin secrets.
 3. Create the database tables by running the SQL in [supabase/schema.sql](/mnt/c/Users/RFEF3Q/Documents/nabucodonosor/supabase/schema.sql).
 4. Start the app with `npm run dev`.
 5. Trigger an initial sync with `npm run sync:news` or `GET /api/sync`.
@@ -57,46 +64,50 @@ supabase/
 ## Environment Variables
 
 ```bash
-NEWS_API_KEY=
-GNEWS_API_KEY=
-NEWSCATCHER_API_KEY=
-CURRENTS_API_KEY=
 SUPABASE_URL=
 SUPABASE_SERVICE_ROLE_KEY=
 CRON_SECRET=
 ADMIN_SESSION_SECRET=
+
+# Optional future extensions
+NEWS_API_KEY=
+GNEWS_API_KEY=
+NEWSCATCHER_API_KEY=
+CURRENTS_API_KEY=
 ```
 
 ## Sync Flow
 
-1. `NewsIngestionAgent` fetches provider data for each editorial category.
-2. `ContentProcessingAgent` normalizes input and filters low-quality or off-domain articles.
-3. `Deduplication Skill` removes duplicates using canonical URL and normalized title hash.
-4. `NewsRankingAgent` assigns a relevance score using recency, keyword match, and source credibility.
-5. Articles are upserted into Supabase and each provider run is written to `sync_runs`.
+1. `SourceRegistryAgent` selects enabled official feeds for the sync.
+2. `FeedIngestionAgent` fetches RSS/Atom items source by source through the feed adapter.
+3. `ClassificationAgent` maps broad feeds into the internal editorial categories when needed.
+4. `ContentProcessingAgent` normalizes input and filters low-quality or off-domain articles.
+5. `Deduplication Skill` removes duplicates using canonical URL and normalized title hash.
+6. `NewsRankingAgent` assigns a relevance score using recency, keyword match, and source credibility.
+7. Articles are upserted into Supabase, configured feed sources are synced into `feed_sources`, and each ingestion run is written to `sync_runs`.
 
 Each ranked article now also stores a `signal_summary` string so the UI can explain why a story is elevated.
 
-## Provider Adapter
+## Feed Adapter
 
-Each provider implements the same interface:
+Each feed adapter implements the same interface:
 
 ```ts
-interface ProviderAdapter {
+interface FeedAdapter {
   name: string;
-  getArticles(category: NewsCategory, keywords: string[], limit: number): Promise<ProviderArticle[]>;
+  getFeedItems(source: FeedSource, limit: number): Promise<FeedItem[]>;
 }
 ```
 
-The frontend only reads from the database through the internal data layer and never calls news providers directly.
+The frontend only reads from the database through the internal data layer and never calls external feeds directly.
 
 ## Free-Tier Mode
 
-- The project is configured by default to use `GNews` only.
+- The project is configured by default to use curated official RSS/Atom feeds only.
 - Vercel cron is disabled by default so the project works on the Hobby plan without paid scheduling.
 - Sync is expected to be triggered manually from the admin console or via `npm run sync:news`.
 - Homepage/API revalidation is reduced to every 30 minutes.
-- This keeps the project usable without paying for multiple news APIs, but it should be treated as a periodically updated prototype rather than a real-time terminal.
+- This keeps the project usable without paying for third-party news APIs, but it should be treated as a periodically updated prototype rather than a real-time terminal.
 
 ## Deployment
 
@@ -104,6 +115,7 @@ The frontend only reads from the database through the internal data layer and ne
 - Add the same environment variables to Vercel.
 - In the default free-tier mode, use the admin console or `npm run sync:news` for manual syncs instead of Vercel cron.
 - Point the project at a Supabase PostgreSQL instance.
+- Apply the latest [supabase/schema.sql](/mnt/c/Users/RFEF3Q/Documents/nabucodonosor/supabase/schema.sql) so the `feed_sources` table exists.
 
 ## Admin
 
@@ -140,6 +152,6 @@ The frontend only reads from the database through the internal data layer and ne
 
 ## Allowed Domains Seed
 
-The editorial domain seed configuration lives in [src/lib/config.ts](/mnt/c/Users/RFEF3Q/Documents/nabucodonosor/src/lib/config.ts).
+The editorial domain seed configuration and the official feed source registry live in [src/lib/config.ts](/mnt/c/Users/RFEF3Q/Documents/nabucodonosor/src/lib/config.ts).
 
-It maps trusted domains per category and is used by the processing and ranking stages.
+It maps trusted domains per category and defines the enabled RSS/Atom sources used by the sync job.

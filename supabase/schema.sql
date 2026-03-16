@@ -35,6 +35,22 @@ create table if not exists public.sync_runs (
 
 create index if not exists sync_runs_started_at_idx on public.sync_runs (started_at desc);
 
+create table if not exists public.feed_sources (
+  id text primary key,
+  name text not null,
+  site_url text not null,
+  feed_url text not null,
+  format text not null check (format in ('rss', 'atom')),
+  category_ids text[] not null default '{}',
+  language text not null default 'en',
+  credibility_weight numeric(10, 4) not null default 0,
+  enabled boolean not null default true,
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now())
+);
+
+create index if not exists feed_sources_enabled_idx on public.feed_sources (enabled);
+
 create table if not exists public.admin_users (
   id uuid primary key default gen_random_uuid(),
   username text not null unique,
@@ -88,6 +104,7 @@ create index if not exists admin_audit_logs_action_idx on public.admin_audit_log
 
 alter table public.articles enable row level security;
 alter table public.sync_runs enable row level security;
+alter table public.feed_sources enable row level security;
 alter table public.admin_users enable row level security;
 alter table public.admin_sessions enable row level security;
 alter table public.admin_login_attempts enable row level security;

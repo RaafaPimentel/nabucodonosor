@@ -50,7 +50,7 @@ export default async function AdminPage() {
 
         <section className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
           <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-6">
-            <h2 className="text-xl font-semibold">Provider status</h2>
+            <h2 className="text-xl font-semibold">Ingestion status</h2>
             <p className="mt-2 text-sm text-slate-400">State-changing admin actions require same-origin POSTs and are audit logged.</p>
             <div className="mt-5 grid gap-3">
               {data.providerSummary.map((run) => (
