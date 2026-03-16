@@ -60,17 +60,6 @@ export interface FeedItem {
   categories?: string[];
 }
 
-export interface ProviderArticle {
-  title?: string;
-  url?: string;
-  sourceName?: string;
-  sourceDomain?: string;
-  description?: string;
-  imageUrl?: string;
-  publishedAt?: string;
-  language?: string;
-}
-
 export interface NormalizedArticle {
   title: string;
   url: string;
@@ -169,11 +158,6 @@ export interface SyncResult {
 export interface ScoreDetails {
   score: number;
   signalSummary: string;
-}
-
-export interface ProviderAdapter {
-  readonly name: string;
-  getArticles(category: NewsCategory, keywords: string[], limit: number): Promise<ProviderArticle[]>;
 }
 
 export interface FeedAdapter {

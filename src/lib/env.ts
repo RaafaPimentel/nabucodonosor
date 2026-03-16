@@ -10,10 +10,6 @@ function readEnv(name: string) {
 }
 
 export const env = {
-  NEWS_API_KEY: readEnv("NEWS_API_KEY"),
-  GNEWS_API_KEY: readEnv("GNEWS_API_KEY"),
-  NEWSCATCHER_API_KEY: readEnv("NEWSCATCHER_API_KEY"),
-  CURRENTS_API_KEY: readEnv("CURRENTS_API_KEY"),
   SUPABASE_URL: readEnv("SUPABASE_URL"),
   SUPABASE_SERVICE_ROLE_KEY: readEnv("SUPABASE_SERVICE_ROLE_KEY") || readEnv("SUPABASE_KEY"),
   CRON_SECRET: readEnv("CRON_SECRET"),

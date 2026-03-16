@@ -29,6 +29,7 @@ Expected changes include:
 
 - `articles`
 - `sync_runs`
+- `feed_sources`
 - `admin_users`
 - `admin_sessions`
 - `admin_login_attempts`
@@ -37,7 +38,7 @@ Expected changes include:
 
 After the script runs, verify:
 
-- all six tables exist
+- all application tables exist
 - indexes were created
 - RLS is enabled for each table
 
@@ -50,6 +51,7 @@ where schemaname = 'public'
   and tablename in (
     'articles',
     'sync_runs',
+    'feed_sources',
     'admin_users',
     'admin_sessions',
     'admin_login_attempts',
@@ -65,10 +67,6 @@ Rotate these values before launch:
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `ADMIN_SESSION_SECRET`
 - `CRON_SECRET`
-- `NEWS_API_KEY`
-- `GNEWS_API_KEY`
-- `NEWSCATCHER_API_KEY`
-- `CURRENTS_API_KEY`
 
 Rules:
 
@@ -95,10 +93,6 @@ In Vercel, update the project environment variables:
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `ADMIN_SESSION_SECRET`
 - `CRON_SECRET`
-- `NEWS_API_KEY`
-- `GNEWS_API_KEY`
-- `NEWSCATCHER_API_KEY`
-- `CURRENTS_API_KEY`
 
 Important:
 
@@ -124,10 +118,6 @@ cp .env.example .env.local
 Then fill in:
 
 ```bash
-NEWS_API_KEY=
-GNEWS_API_KEY=
-NEWSCATCHER_API_KEY=
-CURRENTS_API_KEY=
 SUPABASE_URL=
 SUPABASE_SERVICE_ROLE_KEY=
 CRON_SECRET=
