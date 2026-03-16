@@ -70,6 +70,7 @@ export interface Database {
           site_url: string;
           feed_url: string;
           format: "rss" | "atom";
+          tier: "core" | "related" | "discussion";
           category_ids: string[];
           language: string;
           credibility_weight: number;
@@ -83,6 +84,7 @@ export interface Database {
           site_url: string;
           feed_url: string;
           format: "rss" | "atom";
+          tier: "core" | "related" | "discussion";
           category_ids: string[];
           language?: string;
           credibility_weight?: number;

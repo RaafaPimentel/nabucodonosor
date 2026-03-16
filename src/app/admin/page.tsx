@@ -90,6 +90,50 @@ export default async function AdminPage() {
           </div>
         </section>
 
+        <section className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-6">
+          <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div>
+              <h2 className="text-xl font-semibold">Feed source registry</h2>
+              <p className="mt-2 text-sm text-slate-400">Core feeds drive lead coverage, related feeds enrich story clusters, and discussion feeds stay optional.</p>
+            </div>
+            <div className="text-xs uppercase tracking-[0.2em] text-slate-500">{data.feedSources.length} configured sources</div>
+          </div>
+          <div className="mt-5 grid gap-3 lg:grid-cols-2">
+            {data.feedSources.map((source) => (
+              <div key={source.id} className="rounded-2xl border border-white/5 bg-white/[0.03] px-4 py-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="font-medium text-white">{source.name}</div>
+                    <div className="mt-1 text-sm text-slate-400">{source.siteUrl}</div>
+                  </div>
+                  <div className="flex flex-wrap items-center justify-end gap-2">
+                    <span className="rounded-full border border-white/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-slate-300">
+                      {source.tier}
+                    </span>
+                    <span className="rounded-full border border-white/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] text-slate-300">
+                      {source.format}
+                    </span>
+                    <span
+                      className={`rounded-full border px-2.5 py-1 text-[10px] uppercase tracking-[0.18em] ${
+                        source.enabled ? "border-emerald-400/20 text-emerald-200" : "border-white/10 text-slate-500"
+                      }`}
+                    >
+                      {source.enabled ? "enabled" : "disabled"}
+                    </span>
+                  </div>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {source.categoryIds.map((categoryId) => (
+                    <span key={`${source.id}-${categoryId}`} className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-slate-300">
+                      {categoryId}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
         <section className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
           <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-6">
             <h2 className="text-xl font-semibold">Admin users</h2>

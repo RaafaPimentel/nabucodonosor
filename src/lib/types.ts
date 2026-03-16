@@ -11,6 +11,7 @@ export type NewsCategoryId =
   | "crypto-digital-assets";
 
 export type FeedFormat = "rss" | "atom";
+export type FeedSourceTier = "core" | "related" | "discussion";
 
 export type AdminRole = "viewer" | "editor" | "operator" | "admin";
 
@@ -36,6 +37,8 @@ export interface FeedSource {
   siteUrl: string;
   feedUrl: string;
   format: FeedFormat;
+  tier: FeedSourceTier;
+  matchDomains?: string[];
   categoryIds: NewsCategoryId[];
   language: string;
   credibilityWeight: number;
@@ -85,6 +88,61 @@ export interface DashboardArticle extends ArticleRecord {
   whyThisMatters: string;
   intelligenceTags: string[];
   watchlistEntities: string[];
+  freshnessLabel: "New" | "Fresh" | null;
+  isDeveloping: boolean;
+  relatedCoverage: Array<{
+    id: string;
+    title: string;
+    url: string;
+    sourceName: string;
+    publishedAt: string;
+  }>;
+}
+
+export interface DashboardSection {
+  id: NewsCategoryId;
+  name: string;
+  badge: string;
+  description: string;
+  featured: DashboardArticle | null;
+  articles: DashboardArticle[];
+}
+
+export interface DailyBriefingItem {
+  id: string;
+  title: string;
+  category: NewsCategoryId;
+  badge: string;
+  sourceName: string;
+  whyThisMatters: string;
+  url: string;
+}
+
+export interface PulseMetric {
+  label: string;
+  tone: "hot" | "steady" | "cautious";
+  summary: string;
+}
+
+export interface DashboardData {
+  sectionGroups: Array<{
+    id: string;
+    name: string;
+    description: string;
+    sections: DashboardSection[];
+  }>;
+  sections: DashboardSection[];
+  topSignals: DashboardArticle[];
+  watchlist: WatchlistEntry[];
+  sourceDiversity: SourceDiversityEntry[];
+  briefing: DailyBriefingItem[];
+  pulse: PulseMetric[];
+  stats: {
+    lastUpdatedAt: string | null;
+    syncStatus: string;
+    sourcesProcessed: number;
+    latestRuns: SyncRunRecord[];
+  };
 }
 
 export interface WatchlistEntry {

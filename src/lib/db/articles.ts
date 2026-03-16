@@ -5,6 +5,16 @@ import { ArticleRecord, NormalizedArticle, NewsCategoryId, SyncRunRecord } from 
 
 type ArticleRow = Database["public"]["Tables"]["articles"]["Row"];
 type SyncRunRow = Database["public"]["Tables"]["sync_runs"]["Row"];
+const HOMEPAGE_LOOKBACK_HOURS = 72;
+const SECTION_LOOKBACK_HOURS = 48;
+
+function getHomepageCutoffIso() {
+  return new Date(Date.now() - 1000 * 60 * 60 * HOMEPAGE_LOOKBACK_HOURS).toISOString();
+}
+
+function getSectionCutoffIso() {
+  return new Date(Date.now() - 1000 * 60 * 60 * SECTION_LOOKBACK_HOURS).toISOString();
+}
 
 function mapArticle(row: ArticleRow): ArticleRecord {
   return {
@@ -44,7 +54,7 @@ export async function getHomepageArticles() {
   const { data, error } = await supabase
     .from("articles")
     .select("*")
-    .gte("published_at", new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString())
+    .gte("published_at", getHomepageCutoffIso())
     .order("relevance_score", { ascending: false })
     .order("published_at", { ascending: false })
     .limit(100);
@@ -61,7 +71,7 @@ export async function getTopArticles(limit = 8) {
   const { data, error } = await supabase
     .from("articles")
     .select("*")
-    .gte("published_at", new Date(Date.now() - 1000 * 60 * 60 * 72).toISOString())
+    .gte("published_at", getHomepageCutoffIso())
     .order("relevance_score", { ascending: false })
     .order("published_at", { ascending: false })
     .limit(limit);
@@ -79,8 +89,9 @@ export async function getArticlesByCategory(category: NewsCategoryId, limit = 8)
     .from("articles")
     .select("*")
     .eq("category", category)
-    .order("relevance_score", { ascending: false })
+    .gte("published_at", getSectionCutoffIso())
     .order("published_at", { ascending: false })
+    .order("relevance_score", { ascending: false })
     .limit(limit);
 
   if (error) {

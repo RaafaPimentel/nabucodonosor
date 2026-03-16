@@ -1,7 +1,8 @@
 import { newsCategories } from "@/lib/config";
 import { getArticleCountsByCategory, getLatestSyncRuns } from "@/lib/db/articles";
 import { listAdminUsers, listRecentAdminAuditLogs } from "@/lib/db/admin-auth";
-import { AdminAuditLogRecord, AdminUserRecord, NewsCategoryId, SyncRunRecord } from "@/lib/types";
+import { listFeedSources } from "@/lib/db/feed-sources";
+import { AdminAuditLogRecord, AdminUserRecord, FeedSourceRecord, NewsCategoryId, SyncRunRecord } from "@/lib/types";
 
 interface AdminDashboardData {
   categoryCards: Array<{
@@ -13,19 +14,22 @@ interface AdminDashboardData {
   latestFailures: SyncRunRecord[];
   providerSummary: SyncRunRecord[];
   syncRuns: SyncRunRecord[];
+  feedSources: FeedSourceRecord[];
   adminUsers: AdminUserRecord[];
   auditLogs: AdminAuditLogRecord[];
 }
 
 export async function getAdminDashboardData(): Promise<AdminDashboardData> {
-  const [counts, syncRuns, adminUsers, auditLogs]: [
+  const [counts, syncRuns, feedSources, adminUsers, auditLogs]: [
     Record<NewsCategoryId, number>,
     SyncRunRecord[],
+    FeedSourceRecord[],
     AdminUserRecord[],
     AdminAuditLogRecord[]
   ] = await Promise.all([
     getArticleCountsByCategory(),
     getLatestSyncRuns(20),
+    listFeedSources(),
     listAdminUsers(),
     listRecentAdminAuditLogs(20)
   ]);
@@ -52,6 +56,7 @@ export async function getAdminDashboardData(): Promise<AdminDashboardData> {
     latestFailures,
     providerSummary,
     syncRuns,
+    feedSources,
     adminUsers,
     auditLogs
   };

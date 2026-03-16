@@ -41,6 +41,7 @@ create table if not exists public.feed_sources (
   site_url text not null,
   feed_url text not null,
   format text not null check (format in ('rss', 'atom')),
+  tier text not null default 'core' check (tier in ('core', 'related', 'discussion')),
   category_ids text[] not null default '{}',
   language text not null default 'en',
   credibility_weight numeric(10, 4) not null default 0,
@@ -48,6 +49,10 @@ create table if not exists public.feed_sources (
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now())
 );
+
+alter table public.feed_sources add column if not exists tier text not null default 'core';
+alter table public.feed_sources drop constraint if exists feed_sources_tier_check;
+alter table public.feed_sources add constraint feed_sources_tier_check check (tier in ('core', 'related', 'discussion'));
 
 create index if not exists feed_sources_enabled_idx on public.feed_sources (enabled);
 

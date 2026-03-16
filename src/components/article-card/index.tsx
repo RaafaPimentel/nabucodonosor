@@ -1,26 +1,71 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Expand, Pin } from "lucide-react";
 import { DashboardArticle } from "@/lib/types";
 import { isAllowedImageUrl } from "@/lib/utils/images";
-import { timeAgo } from "@/lib/utils";
+import { cn, timeAgo } from "@/lib/utils";
 
-export function ArticleCard({ article, badge }: { article: DashboardArticle; badge: string }) {
+export function ArticleCard({
+  article,
+  badge,
+  compact = false,
+  selected = false,
+  pinned = false,
+  onOpenBriefing,
+  onTogglePin
+}: {
+  article: DashboardArticle;
+  badge: string;
+  compact?: boolean;
+  selected?: boolean;
+  pinned?: boolean;
+  onOpenBriefing?: (article: DashboardArticle) => void;
+  onTogglePin?: (article: DashboardArticle) => void;
+}) {
   const showImage = isAllowedImageUrl(article.imageUrl);
   const imageUrl = showImage ? article.imageUrl! : null;
 
   return (
-    <Link
-      href={article.url}
-      target="_blank"
-      rel="noreferrer"
-      className="group grid gap-4 rounded-3xl border border-white/10 bg-white/[0.04] p-4 shadow-panel backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-cyan-300/30 hover:bg-white/[0.07]"
+    <article
+      className={cn(
+        "group grid gap-4 rounded-3xl border bg-white/[0.04] shadow-panel backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-cyan-300/30 hover:bg-white/[0.07]",
+        compact ? "p-3" : "p-4",
+        selected ? "border-cyan-300/40 ring-1 ring-cyan-300/20" : "border-white/10"
+      )}
     >
       <div className="flex items-start justify-between gap-3">
-        <span className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-cyan-200">
-          {badge}
-        </span>
-        <ArrowUpRight className="h-4 w-4 text-slate-500 transition group-hover:text-cyan-200" />
+        <div className="flex flex-wrap gap-2">
+          <span className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-cyan-200">
+            {badge}
+          </span>
+          {article.freshnessLabel ? (
+            <span className="rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-100">
+              {article.freshnessLabel}
+            </span>
+          ) : null}
+          {article.isDeveloping ? (
+            <span className="rounded-full border border-amber-300/20 bg-amber-300/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-100">
+              Developing
+            </span>
+          ) : null}
+        </div>
+        <div className="flex items-center gap-2">
+          {onTogglePin ? (
+            <button type="button" onClick={() => onTogglePin(article)} className="rounded-full border border-white/10 bg-white/[0.04] p-2 text-slate-300 transition hover:bg-white/[0.08]">
+              <Pin className={cn("h-4 w-4", pinned ? "fill-current text-cyan-100" : "")} />
+            </button>
+          ) : null}
+          {onOpenBriefing ? (
+            <button type="button" onClick={() => onOpenBriefing(article)} className="rounded-full border border-white/10 bg-white/[0.04] p-2 text-slate-300 transition hover:bg-white/[0.08]">
+              <Expand className="h-4 w-4" />
+            </button>
+          ) : null}
+          <Link href={article.url} target="_blank" rel="noreferrer" className="rounded-full border border-white/10 bg-white/[0.04] p-2 text-slate-300 transition hover:bg-white/[0.08]">
+            <ArrowUpRight className="h-4 w-4 text-slate-500 transition group-hover:text-cyan-200" />
+          </Link>
+        </div>
       </div>
       {imageUrl ? (
         <div className="relative aspect-[16/9] overflow-hidden rounded-2xl">
@@ -41,11 +86,34 @@ export function ArticleCard({ article, badge }: { article: DashboardArticle; bad
         ) : null}
         <p className="text-xs leading-5 text-slate-400">{article.whyThisMatters}</p>
         {article.signalSummary ? <p className="text-[11px] uppercase tracking-[0.2em] text-cyan-100/70">{article.signalSummary}</p> : null}
+        <div className="h-1.5 overflow-hidden rounded-full bg-white/8">
+          <div className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-blue-400" style={{ width: `${Math.min(100, Math.round(article.relevanceScore * 100))}%` }} />
+        </div>
       </div>
       <div className="flex items-center justify-between text-xs text-slate-400">
         <span>{article.sourceName}</span>
         <span>{timeAgo(article.publishedAt)}</span>
       </div>
-    </Link>
+      {article.relatedCoverage.length ? (
+        <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">More coverage</p>
+          <div className="mt-2 space-y-1.5">
+            {article.relatedCoverage.map((item) => (
+              <Link
+                key={item.id}
+                href={item.url}
+                target="_blank"
+                rel="noreferrer"
+                className="block text-xs leading-5 text-slate-300 transition hover:text-cyan-100"
+              >
+                <span className="text-slate-500">{item.sourceName}</span>
+                <span className="mx-1.5 text-slate-600">/</span>
+                <span>{item.title}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </article>
   );
 }

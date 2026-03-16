@@ -6,6 +6,11 @@ Paid news APIs remain optional future extensions. They are no longer required co
 
 The editorial surface now covers the original core sections plus expanded intelligence topics such as Product, DevOps & Cloud, Data & Analytics, Fintech, and Crypto & Digital Assets.
 
+Sources are now organized into tiers:
+- `core` for primary coverage
+- `related` for additional coverage around the same story
+- `discussion` for optional community signal sources such as forums
+
 ## Stack
 
 - Next.js App Router
