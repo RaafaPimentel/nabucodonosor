@@ -15,3 +15,7 @@ export const env = {
   CRON_SECRET: readEnv("CRON_SECRET"),
   ADMIN_SESSION_SECRET: readEnv("ADMIN_SESSION_SECRET")
 };
+
+export function hasSupabaseServerConfig() {
+  return Boolean(env.SUPABASE_URL && env.SUPABASE_SERVICE_ROLE_KEY);
+}
