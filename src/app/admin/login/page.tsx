@@ -1,4 +1,5 @@
 import { countAdminUsers } from "@/lib/db/admin-auth";
+import { hasSupabaseServerConfig } from "@/lib/env";
 
 export default async function AdminLoginPage({
   searchParams
@@ -6,7 +7,8 @@ export default async function AdminLoginPage({
   searchParams: Promise<{ reason?: string; error?: string }>;
 }) {
   const params = await searchParams;
-  const adminCount = await countAdminUsers().catch(() => 0);
+  const hasServerConfig = hasSupabaseServerConfig();
+  const adminCount = hasServerConfig ? await countAdminUsers().catch(() => 0) : 0;
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-[linear-gradient(180deg,_#050816_0%,_#030712_100%)] px-6 text-white">
@@ -18,6 +20,11 @@ export default async function AdminLoginPage({
             ? "Use an admin user stored in Supabase to access the internal console."
             : "No admin users exist yet. Bootstrap one with `npm run admin:create -- --username <name> --password <password> --role admin>`."}
         </p>
+        {!hasServerConfig ? (
+          <p className="mt-4 rounded-2xl border border-amber-300/20 bg-amber-300/10 px-4 py-3 text-sm text-amber-100">
+            Admin auth is not configured on this environment yet. Add `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` to the server env before signing in.
+          </p>
+        ) : null}
         {params.error ? <p className="mt-4 rounded-2xl border border-rose-300/20 bg-rose-300/10 px-4 py-3 text-sm text-rose-100">{params.error}</p> : null}
         <form action="/api/admin/login" method="post" className="mt-6 space-y-4">
           <label className="block space-y-2">
