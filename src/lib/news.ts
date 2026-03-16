@@ -1,4 +1,4 @@
-import { newsCategories } from "@/lib/config";
+import { feedSources, newsCategories, newsCategoryGroups } from "@/lib/config";
 import { buildSourceDiversity, buildWatchlist, toDashboardArticle } from "@/lib/editorial";
 import { getArticlesByCategory, getLatestSyncRuns, getTopArticles } from "@/lib/db/articles";
 import { ArticleRecord, DashboardArticle, SourceDiversityEntry, SyncRunRecord, WatchlistEntry } from "@/lib/types";
@@ -55,11 +55,16 @@ export async function getDashboardData() {
     }));
   }
 
-  const processedProviders = new Set(syncRuns.map((run) => run.provider));
   const latestStartedAt = syncRuns[0]?.startedAt ?? null;
   const degraded = syncRuns.some((run) => run.status === "failed" || run.status === "partial");
 
   return {
+    sectionGroups: newsCategoryGroups.map((group) => ({
+      ...group,
+      sections: group.categoryIds
+        .map((categoryId) => sections.find((section) => section.id === categoryId) ?? null)
+        .filter((section): section is (typeof sections)[number] => Boolean(section))
+    })),
     sections,
     topSignals: topSignalArticles,
     watchlist,
@@ -67,7 +72,7 @@ export async function getDashboardData() {
     stats: {
       lastUpdatedAt: latestStartedAt,
       syncStatus: degraded ? "Degraded" : "Healthy",
-      sourcesProcessed: processedProviders.size,
+      sourcesProcessed: feedSources.filter((source) => source.enabled).length,
       latestRuns: syncRuns
     }
   };

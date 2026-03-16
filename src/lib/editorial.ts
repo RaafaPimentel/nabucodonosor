@@ -18,7 +18,16 @@ const watchlistDictionary = [
   "Tesla",
   "Steam",
   "PlayStation",
-  "Xbox"
+  "Xbox",
+  "Stripe",
+  "Coinbase",
+  "Circle",
+  "Visa",
+  "Mastercard",
+  "Databricks",
+  "Snowflake",
+  "Bitcoin",
+  "Ethereum"
 ];
 
 const crossCategoryPatterns: Array<{ label: string; terms: string[] }> = [
@@ -26,7 +35,11 @@ const crossCategoryPatterns: Array<{ label: string; terms: string[] }> = [
   { label: "Gaming x Streaming", terms: ["gaming", "game", "streaming", "netflix", "disney", "playstation", "xbox"] },
   { label: "Policy", terms: ["regulation", "policy", "government", "lawmakers", "antitrust", "fed", "imf"] },
   { label: "Chips", terms: ["chip", "semiconductor", "nvidia", "gpu", "foundry"] },
-  { label: "Open Source", terms: ["open source", "github", "linux", "framework", "rust", "python"] }
+  { label: "Open Source", terms: ["open source", "github", "linux", "framework", "rust", "python"] },
+  { label: "Fintech", terms: ["payments", "fintech", "banking", "stripe", "visa", "mastercard", "block"] },
+  { label: "Digital Assets", terms: ["bitcoin", "ethereum", "stablecoin", "crypto", "digital assets", "tokenization"] },
+  { label: "Cloud", terms: ["cloud", "aws", "azure", "google cloud", "kubernetes", "devops", "sre"] },
+  { label: "Data", terms: ["data", "analytics", "warehouse", "databricks", "snowflake", "vector database", "etl"] }
 ];
 
 export function buildWhyThisMatters(article: ArticleRecord, category: NewsCategory) {

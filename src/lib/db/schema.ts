@@ -63,6 +63,35 @@ export interface Database {
         };
         Update: Partial<Database["public"]["Tables"]["sync_runs"]["Insert"]>;
       };
+      feed_sources: {
+        Row: {
+          id: string;
+          name: string;
+          site_url: string;
+          feed_url: string;
+          format: "rss" | "atom";
+          category_ids: string[];
+          language: string;
+          credibility_weight: number;
+          enabled: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id: string;
+          name: string;
+          site_url: string;
+          feed_url: string;
+          format: "rss" | "atom";
+          category_ids: string[];
+          language?: string;
+          credibility_weight?: number;
+          enabled?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["feed_sources"]["Insert"]>;
+      };
       admin_users: {
         Row: {
           id: string;
