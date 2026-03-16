@@ -1,13 +1,15 @@
 import { feedSources, newsCategories, newsCategoryGroups } from "@/lib/config";
-import { buildSourceDiversity, buildWatchlist, toDashboardArticle } from "@/lib/editorial";
+import { buildDailyBriefing, buildPulse, buildSourceDiversity, buildWatchlist, clusterCoverage, toDashboardArticle } from "@/lib/editorial";
 import { getArticlesByCategory, getLatestSyncRuns, getTopArticles } from "@/lib/db/articles";
-import { ArticleRecord, DashboardArticle, SourceDiversityEntry, SyncRunRecord, WatchlistEntry } from "@/lib/types";
+import { ArticleRecord, DashboardArticle, DashboardData, SourceDiversityEntry, SyncRunRecord, WatchlistEntry } from "@/lib/types";
 
-export async function getDashboardData() {
+export async function getDashboardData(): Promise<DashboardData> {
   let topSignalArticles: DashboardArticle[] = [];
   let syncRuns: SyncRunRecord[] = [];
   let watchlist: WatchlistEntry[] = [];
   let sourceDiversity: SourceDiversityEntry[] = [];
+  let briefing = [] as DashboardData["briefing"];
+  let pulse = [] as DashboardData["pulse"];
   let sections = newsCategories.map((category) => ({
     ...category,
     featured: null as DashboardArticle | null,
@@ -18,7 +20,7 @@ export async function getDashboardData() {
     const [topArticles, latestSyncRuns, sectionArticles] = await Promise.all([
       getTopArticles(6),
       getLatestSyncRuns(8),
-      Promise.all(newsCategories.map((category) => getArticlesByCategory(category.id, 5)))
+      Promise.all(newsCategories.map((category) => getArticlesByCategory(category.id, 8)))
     ]);
 
     topSignalArticles = topArticles.map((article: ArticleRecord) => {
@@ -28,7 +30,7 @@ export async function getDashboardData() {
     syncRuns = latestSyncRuns;
     sections = newsCategories.map((category, index) => {
       const items = sectionArticles[index] ?? [];
-      const dashboardItems = items.map((article: ArticleRecord) => toDashboardArticle(article, category));
+      const dashboardItems = clusterCoverage(items.map((article: ArticleRecord) => toDashboardArticle(article, category))).slice(0, 5);
 
       return {
         ...category,
@@ -43,11 +45,15 @@ export async function getDashboardData() {
     ]);
     watchlist = buildWatchlist(combinedArticles);
     sourceDiversity = buildSourceDiversity(combinedArticles);
+    briefing = buildDailyBriefing(topSignalArticles, newsCategories);
+    pulse = buildPulse(sections, newsCategories);
   } catch {
     topSignalArticles = [];
     syncRuns = [];
     watchlist = [];
     sourceDiversity = [];
+    briefing = [];
+    pulse = [];
     sections = newsCategories.map((category) => ({
       ...category,
       featured: null,
@@ -69,6 +75,8 @@ export async function getDashboardData() {
     topSignals: topSignalArticles,
     watchlist,
     sourceDiversity,
+    briefing,
+    pulse,
     stats: {
       lastUpdatedAt: latestStartedAt,
       syncStatus: degraded ? "Degraded" : "Healthy",

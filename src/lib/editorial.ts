@@ -1,4 +1,16 @@
-import { ArticleRecord, DashboardArticle, NewsCategory, NewsCategoryId, SourceDiversityEntry, WatchlistEntry } from "@/lib/types";
+import { feedSources } from "@/lib/config";
+import {
+  ArticleRecord,
+  DashboardArticle,
+  DailyBriefingItem,
+  FeedSourceTier,
+  NewsCategory,
+  NewsCategoryId,
+  PulseMetric,
+  SourceDiversityEntry,
+  WatchlistEntry
+} from "@/lib/types";
+import { normalizeTitle } from "@/lib/utils/hash";
 
 const watchlistDictionary = [
   "OpenAI",
@@ -83,12 +95,178 @@ export function buildIntelligenceTags(article: ArticleRecord, category: NewsCate
 }
 
 export function toDashboardArticle(article: ArticleRecord, category: NewsCategory): DashboardArticle {
+  const ageHours = (Date.now() - new Date(article.publishedAt).getTime()) / (1000 * 60 * 60);
   return {
     ...article,
     whyThisMatters: buildWhyThisMatters(article, category),
     intelligenceTags: buildIntelligenceTags(article, category),
-    watchlistEntities: extractWatchlistEntities(article)
+    watchlistEntities: extractWatchlistEntities(article),
+    freshnessLabel: ageHours <= 6 ? "New" : ageHours <= 24 ? "Fresh" : null,
+    isDeveloping: false,
+    relatedCoverage: []
   };
+}
+
+const clusteringStopwords = new Set([
+  "the",
+  "a",
+  "an",
+  "and",
+  "or",
+  "to",
+  "of",
+  "for",
+  "in",
+  "on",
+  "with",
+  "from",
+  "as",
+  "at",
+  "by",
+  "is",
+  "are",
+  "after",
+  "over",
+  "into",
+  "new",
+  "how",
+  "why"
+]);
+
+function getClusteringTokens(article: DashboardArticle) {
+  return new Set(
+    normalizeTitle(article.title)
+      .split(" ")
+      .filter((token) => token.length > 2 && !clusteringStopwords.has(token))
+      .slice(0, 8)
+  );
+}
+
+function isRelatedCoverage(left: DashboardArticle, right: DashboardArticle) {
+  const leftTokens = getClusteringTokens(left);
+  const rightTokens = getClusteringTokens(right);
+  const overlappingTokens: string[] = [];
+
+  for (const token of leftTokens) {
+    if (rightTokens.has(token)) {
+      overlappingTokens.push(token);
+    }
+  }
+
+  const overlap = overlappingTokens.length;
+  const hoursApart = Math.abs(new Date(left.publishedAt).getTime() - new Date(right.publishedAt).getTime()) / (1000 * 60 * 60);
+  const hasLongSharedToken = overlappingTokens.some((token) => token.length >= 6);
+
+  return overlap >= 3 || (overlap >= 2 && hasLongSharedToken && hoursApart <= 18);
+}
+
+function getArticleSourceTier(article: DashboardArticle): FeedSourceTier {
+  const match = feedSources.find((source) => {
+    const matchDomains = source.matchDomains ?? [source.siteUrl.replace(/^https?:\/\//, "").replace(/^www\./, "").split("/")[0]];
+    return source.name === article.sourceName || matchDomains.includes(article.sourceDomain);
+  });
+
+  return match?.tier ?? "related";
+}
+
+function isHigherPriorityTier(candidate: DashboardArticle, current: DashboardArticle) {
+  const order: FeedSourceTier[] = ["core", "related", "discussion"];
+  return order.indexOf(getArticleSourceTier(candidate)) < order.indexOf(getArticleSourceTier(current));
+}
+
+export function clusterCoverage(entries: DashboardArticle[]) {
+  const leads: DashboardArticle[] = [];
+
+  for (const article of entries) {
+    const articleTier = getArticleSourceTier(article);
+    const lead = leads.find((candidate) => isRelatedCoverage(candidate, article));
+
+    if (articleTier === "discussion" && !lead) {
+      continue;
+    }
+
+    if (!lead) {
+      leads.push({
+        ...article,
+        relatedCoverage: []
+      });
+      continue;
+    }
+
+    if (isHigherPriorityTier(article, lead)) {
+      article.relatedCoverage = [
+        {
+          id: lead.id,
+          title: lead.title,
+          url: lead.url,
+          sourceName: lead.sourceName,
+          publishedAt: lead.publishedAt
+        },
+        ...lead.relatedCoverage
+      ].slice(0, 3);
+
+      const leadIndex = leads.findIndex((candidate) => candidate.id === lead.id);
+      leads[leadIndex] = article;
+      continue;
+    }
+
+    if (lead.sourceName === article.sourceName) {
+      continue;
+    }
+
+    lead.relatedCoverage.push({
+      id: article.id,
+      title: article.title,
+      url: article.url,
+      sourceName: article.sourceName,
+      publishedAt: article.publishedAt
+    });
+  }
+
+  return leads.map((lead) => ({
+    ...lead,
+    isDeveloping: lead.relatedCoverage.length >= 2,
+    relatedCoverage: lead.relatedCoverage
+      .sort((left, right) => new Date(right.publishedAt).getTime() - new Date(left.publishedAt).getTime())
+      .slice(0, 3)
+  }));
+}
+
+export function buildDailyBriefing(entries: DashboardArticle[], categories: NewsCategory[]): DailyBriefingItem[] {
+  return entries.slice(0, 5).map((article) => {
+    const category = categories.find((item) => item.id === article.category)!;
+
+    return {
+      id: article.id,
+      title: article.title,
+      category: article.category,
+      badge: category.badge,
+      sourceName: article.sourceName,
+      whyThisMatters: article.whyThisMatters,
+      url: article.url
+    };
+  });
+}
+
+export function buildPulse(sections: Array<{ id: NewsCategoryId; featured: DashboardArticle | null; articles: DashboardArticle[] }>, categories: NewsCategory[]) {
+  return sections.slice(0, 4).map<PulseMetric>((section) => {
+    const category = categories.find((item) => item.id === section.id)!;
+    const entries = [section.featured, ...section.articles].filter(Boolean) as DashboardArticle[];
+    const newCount = entries.filter((entry) => entry.freshnessLabel === "New").length;
+    const developingCount = entries.filter((entry) => entry.isDeveloping).length;
+    const tone: PulseMetric["tone"] = newCount >= 2 ? "hot" : developingCount >= 1 ? "steady" : "cautious";
+
+    return {
+      label: category.badge,
+      tone,
+      summary:
+        tone === "hot"
+          ? `${newCount} fast-moving stories now`
+          : tone === "steady"
+            ? `${developingCount} clustered story lines building`
+            : "Quieter cycle with slower-moving updates"
+    };
+  });
 }
 
 export function buildWatchlist(entries: DashboardArticle[]): WatchlistEntry[] {

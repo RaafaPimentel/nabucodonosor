@@ -9,6 +9,7 @@ const source: FeedSource = {
   siteUrl: "https://example.com",
   feedUrl: "https://example.com/feed.xml",
   format: "rss",
+  tier: "core",
   categoryIds: ["ai-technology"],
   language: "en",
   credibilityWeight: 0.9,

@@ -1,3 +1,5 @@
+"use client";
+
 import { ArticleCard } from "@/components/article-card";
 import { FeaturedCard } from "@/components/featured-card";
 import { DashboardArticle } from "@/lib/types";
@@ -8,7 +10,12 @@ export function NewsSection({
   description,
   badge,
   featured,
-  articles
+  articles,
+  compact = false,
+  selectedArticleId,
+  pinnedIds = [],
+  onOpenBriefing,
+  onTogglePin
 }: {
   sectionId: string;
   title: string;
@@ -16,6 +23,11 @@ export function NewsSection({
   badge: string;
   featured: DashboardArticle | null;
   articles: DashboardArticle[];
+  compact?: boolean;
+  selectedArticleId?: string | null;
+  pinnedIds?: string[];
+  onOpenBriefing?: (article: DashboardArticle) => void;
+  onTogglePin?: (article: DashboardArticle) => void;
 }) {
   return (
     <section id={sectionId} className="scroll-mt-36 space-y-6">
@@ -33,10 +45,27 @@ export function NewsSection({
       </div>
       {featured ? (
         <div className="grid gap-5 lg:grid-cols-[1.25fr_0.95fr]">
-          <FeaturedCard article={featured} badge={badge} />
+          <FeaturedCard
+            article={featured}
+            badge={badge}
+            compact={compact}
+            selected={selectedArticleId === featured.id}
+            pinned={pinnedIds.includes(featured.id)}
+            onOpenBriefing={onOpenBriefing}
+            onTogglePin={onTogglePin}
+          />
           <div className="grid gap-4">
             {articles.map((article) => (
-              <ArticleCard key={article.id} article={article} badge={badge} />
+              <ArticleCard
+                key={article.id}
+                article={article}
+                badge={badge}
+                compact={compact}
+                selected={selectedArticleId === article.id}
+                pinned={pinnedIds.includes(article.id)}
+                onOpenBriefing={onOpenBriefing}
+                onTogglePin={onTogglePin}
+              />
             ))}
           </div>
         </div>

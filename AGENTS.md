@@ -190,6 +190,10 @@ Planned RSS-first path:
 - All ingestion output must be normalized into the internal article format before ranking and storage.
 - Feed sources and paid APIs should both be treated as adapters behind stable internal interfaces.
 - Paid APIs are optional extensions, not required core dependencies for the MVP.
+- Feed sources should be categorized by tier:
+  - `core`: primary editorial sources used for main coverage
+  - `related`: secondary coverage used to enrich story clusters
+  - `discussion`: optional community/commentary sources kept off by default
 
 ## Related Docs
 
