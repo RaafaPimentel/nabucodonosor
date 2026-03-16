@@ -624,6 +624,7 @@ export const allowedImageHosts = [
   "eurogamer.net",
   "ft.com",
   "gamespot.com",
+  "www.gamespot.com",
   "gnews.io",
   "hollywoodreporter.com",
   "i.insider.com",
