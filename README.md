@@ -1,10 +1,6 @@
-# Oraculum
+# Nabucodonosor
 
-Oraculum is a full-stack technology intelligence dashboard built with Next.js, TypeScript, Tailwind CSS, and Supabase. It ingests articles through an official RSS/Atom feed adapter architecture, normalizes and deduplicates them, ranks them, and renders an editorial homepage backed by PostgreSQL.
-
-Paid news APIs remain optional future extensions. They are no longer required core dependencies for the MVP.
-
-The editorial surface now covers the original core sections plus expanded intelligence topics such as Product, DevOps & Cloud, Data & Analytics, Fintech, and Crypto & Digital Assets.
+Full-stack technology intelligence dashboard with RSS ingestion, ranking agents, Supabase, admin console and security hardening.
 
 Sources are now organized into tiers:
 - `core` for primary coverage
