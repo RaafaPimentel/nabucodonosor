@@ -1,5 +1,4 @@
 # Nabucodonosor
-
 Full-stack technology intelligence dashboard with RSS ingestion, ranking agents, Supabase, admin console and security hardening.
 
 Sources are now organized into tiers:
