@@ -52,6 +52,8 @@ supabase/
 
 See [docs/rss-agent-migration.md](/mnt/c/Users/RFEF3Q/Documents/nabucodonosor/docs/rss-agent-migration.md) for the RSS-first agent split and migration sequence.
 
+![CI](https://github.com/RaafaPimentel/nabucodonosor/actions/workflows/ci.yml/badge.svg)
+
 ## Setup
 
 1. Install dependencies with `npm install`.
