@@ -1,4 +1,7 @@
 # Nabucodonosor
+
+![CI](https://github.com/RaafaPimentel/nabucodonosor/actions/workflows/ci.yml/badge.svg)
+
 Full-stack technology intelligence dashboard with RSS ingestion, ranking agents, Supabase, admin console and security hardening.
 
 Sources are now organized into tiers:
@@ -51,8 +54,6 @@ supabase/
 ```
 
 See [docs/rss-agent-migration.md](/mnt/c/Users/RFEF3Q/Documents/nabucodonosor/docs/rss-agent-migration.md) for the RSS-first agent split and migration sequence.
-
-![CI](https://github.com/RaafaPimentel/nabucodonosor/actions/workflows/ci.yml/badge.svg)
 
 ## Setup
 
