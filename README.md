@@ -53,13 +53,13 @@ supabase/
   schema.sql
 ```
 
-See [docs/rss-agent-migration.md](/mnt/c/Users/RFEF3Q/Documents/nabucodonosor/docs/rss-agent-migration.md) for the RSS-first agent split and migration sequence.
+See [docs/rss-agent-migration.md](docs/rss-agent-migration.md) for the RSS-first agent split and migration sequence.
 
 ## Setup
 
 1. Install dependencies with `npm install`.
 2. Copy `.env.example` to `.env.local` and fill in the Supabase credentials and admin secrets.
-3. Create the database tables by running the SQL in [supabase/schema.sql](/mnt/c/Users/RFEF3Q/Documents/nabucodonosor/supabase/schema.sql).
+3. Create the database tables by running the SQL in [supabase/schema.sql](supabase/schema.sql).
 4. Start the app with `npm run dev`.
 5. Trigger an initial sync with `npm run sync:news` or `GET /api/sync`.
 6. Create the first admin user with `npm run admin:create -- --username <name> --password <password> --role admin`.
