@@ -1,6 +1,6 @@
 # Nabucodonosor
 
-![CI](https://github.com/RaafaPimentel/nabucodonosor/actions/workflows/ci.yml/badge.svg)
+[![CI](https://github.com/RaafaPimentel/nabucodonosor/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/RaafaPimentel/nabucodonosor/actions/workflows/ci.yml)
 
 Full-stack technology intelligence dashboard with RSS ingestion, ranking agents, Supabase, admin console and security hardening.
 
