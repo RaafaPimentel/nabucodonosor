@@ -112,14 +112,14 @@ The frontend only reads from the database through the internal data layer and ne
 - Add the same environment variables to Vercel.
 - In the default free-tier mode, use the admin console or `npm run sync:news` for manual syncs instead of Vercel cron.
 - Point the project at a Supabase PostgreSQL instance.
-- Apply the latest [supabase/schema.sql](/mnt/c/Users/RFEF3Q/Documents/nabucodonosor/supabase/schema.sql) so the `feed_sources` table exists.
+- Apply the latest [supabase/schema.sql](supabase/schema.sql)so the `feed_sources` table exists.
 
 ## Admin
 
 - Create users in Supabase-backed admin tables with `npm run admin:create -- --username <name> --password <password> --role admin`.
 - Visit `/admin/login` and sign in with that stored account.
 - The admin console shows per-category inventory, latest provider status, degraded runs, and a manual sync trigger.
-- Route protection is enforced by [middleware.ts](/mnt/c/Users/RFEF3Q/Documents/nabucodonosor/middleware.ts).
+- Route protection is enforced by [middleware.ts](middleware.ts).
 
 ## Security Notes
 
@@ -129,7 +129,7 @@ The frontend only reads from the database through the internal data layer and ne
 - Admin POST routes enforce same-origin requests and middleware attaches baseline security headers.
 - Row Level Security is enabled on all application tables; this app expects a server-side Supabase service-role key and does not expose direct browser DB access.
 - The public `/api/news` JSON endpoint has a lightweight IP-based rate limit.
-- Apply the updated SQL in [supabase/schema.sql](/mnt/c/Users/RFEF3Q/Documents/nabucodonosor/supabase/schema.sql) before using the hardened admin flow.
+- Apply the updated SQL in [supabase/schema.sql](supabase/schema.sql) before using the hardened admin flow.
 
 ## Launch Checklist
 
@@ -141,7 +141,7 @@ The frontend only reads from the database through the internal data layer and ne
 - On Vercel Hobby, do not depend on cron. Use manual/admin-triggered syncs or an external free scheduler if needed later.
 - Confirm your Vercel project does not expose server env vars to the client bundle.
 - Keep CSP reviewed if you later add third-party scripts, analytics, or external font/CDN assets.
-- Follow the full launch runbook in [docs/launch-runbook.md](/mnt/c/Users/RFEF3Q/Documents/nabucodonosor/docs/launch-runbook.md).
+- Follow the full launch runbook in [docs/launch-runbook.md](docs/launch-runbook.md).
 
 ## Testing
 
@@ -149,6 +149,6 @@ The frontend only reads from the database through the internal data layer and ne
 
 ## Allowed Domains Seed
 
-The editorial domain seed configuration and the official feed source registry live in [src/lib/config.ts](/mnt/c/Users/RFEF3Q/Documents/nabucodonosor/src/lib/config.ts).
+The editorial domain seed configuration and the official feed source registry live in [src/lib/config.ts](src/lib/config.ts).
 
 It maps trusted domains per category and defines the enabled RSS/Atom sources used by the sync job.
